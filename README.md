@@ -1,7 +1,7 @@
 PlePer API
 ===============
 
-A basic PHP wrapper to work with PlePer API.
+A basic PHP wrapper to work with [PlePer API](https://pleper.com/)
 
 Installation
 ------------
