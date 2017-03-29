@@ -13,15 +13,17 @@ use Exception;
  */
 class Api {
 
-      const ENDPOINT = 'https://pleper.com/api/v1';
       const HTTP_POST = 'post';
       const HTTP_GET = 'get';
 
       /** @var string */
-      protected $endpoint;
+      protected $apiKey;
 
       /** @var string */
-      protected $apiKey;
+      protected $endpoint = 'https://pleper.com/api/v1';
+
+      /** @var string */
+      protected $apiSecret;
 
       /** @var object */
       protected $guzzleClient;
@@ -35,11 +37,19 @@ class Api {
       /**
        * @param string $apiKey
        * @param string $apiSecret
-       * @param string $endpoint
        */
-      public function __construct($apiKey, $endpoint = '') {
-            $this->endpoint = empty($endpoint) ? static::ENDPOINT : $endpoint;
+      public function __construct($apiKey, $apiSecret) {
             $this->apiKey = $apiKey;
+            $this->apiSecret = $apiSecret;
+      }
+
+      /**
+       * @return string
+       */
+      public function get_sig($params) {
+            krsort($params);
+            $sig = hash_hmac('sha1', $this->apiKey . json_encode($params), $this->apiSecret);
+            return $sig;
       }
 
       /**
@@ -54,8 +64,13 @@ class Api {
             if ( !in_array($httpMethod, $this->allowedHttpMethods) ) {
                   throw new \Exception('Invalid HTTP method specified.');
             }
+
+            //Get the signature
+            $sig = $this->get_sig($params);
+
             $params = array_merge(array(
                 'api-key' => $this->apiKey,
+                'api-sig' => $sig,
                     ), $params);
 
             //Reuse the guzzle client
