@@ -1,0 +1,19 @@
+{
+    "name": "pleper/api",
+    "description": "PlePer API wrapper",
+    "minimum-stability": "stable",
+    "authors": [
+        {
+            "name": "Stan Kolev",
+            "email": "office@pleper.com"
+        }
+    ],
+    "require": {
+        "guzzlehttp/guzzle": "~4.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "" : "src/"
+        }
+    }
+}
