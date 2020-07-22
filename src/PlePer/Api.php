@@ -48,7 +48,7 @@ class Api {
        */
       public function get_sig($params) {
             krsort($params);
-            $sig = hash_hmac('sha1', $this->apiKey . json_encode($params), $this->apiSecret);
+            $sig = hash_hmac('sha1', $this->apiKey . json_encode($params, JSON_NUMERIC_CHECK), $this->apiSecret);
             return $sig;
       }
 
