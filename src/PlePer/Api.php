@@ -11,10 +11,11 @@ use Exception;
  *
  * @package PlePer
  */
-class Api {
+class Api
+{
 
       const HTTP_POST = 'post';
-      const HTTP_GET = 'get';
+      const HTTP_GET  = 'get';
 
       /** @var string */
       protected $apiKey;
@@ -35,18 +36,25 @@ class Api {
       );
 
       /**
-       * @param string $apiKey
-       * @param string $apiSecret
+       * 
+       * @param type $apiKey
+       * @param type $apiSecret
+       * @param type $endpoint
        */
-      public function __construct($apiKey, $apiSecret) {
-            $this->apiKey = $apiKey;
+      public function __construct($apiKey, $apiSecret, $endpoint = '')
+      {
+            $this->apiKey    = $apiKey;
             $this->apiSecret = $apiSecret;
+            if ( $endpoint ) {
+                  $this->endpoint = $endpoint;
+            }
       }
 
       /**
        * @return string
        */
-      public function get_sig($params) {
+      public function get_sig($params)
+      {
             krsort($params);
             $sig = hash_hmac('sha1', $this->apiKey . json_encode($params, JSON_NUMERIC_CHECK), $this->apiSecret);
             return $sig;
@@ -59,7 +67,8 @@ class Api {
        * @throws \Exception
        * @return bool|mixed
        */
-      public function call($method, $params = array(), $httpMethod = self::HTTP_POST) {
+      public function call($method, $params = array(), $httpMethod = self::HTTP_POST)
+      {
 
             if ( !in_array($httpMethod, $this->allowedHttpMethods) ) {
                   throw new \Exception('Invalid HTTP method specified.');
@@ -78,21 +87,24 @@ class Api {
                   $client = $this->guzzleClient;
             }
             else {
-                  $client = new Client();
+                  $client             = new Client();
                   $this->guzzleClient = $client;
             }
 
             try {
+                  echo $this->endpoint . $method;
                   if ( $httpMethod === static::HTTP_GET ) {
                         $result = $client->get($this->endpoint . $method, array('query' => $params));
                   }
                   else {
-                        $result = $client->$httpMethod($this->endpoint . $method, array('body' => $params));
+                        $result = $client->$httpMethod($this->endpoint . $method, array('form_params' => $params));
                   }
             } catch (RequestException $e) {
                   $result = $e->getResponse();
             }
-            return $result->json();
+            echo 'results';
+            echo $result->getBody();
+            return json_decode($result->getBody(), true);
       }
 
       /**
@@ -100,7 +112,8 @@ class Api {
        * @param array $params
        * @return bool|mixed
        */
-      public function get($method, $params = array()) {
+      public function get($method, $params = array())
+      {
             return $this->call($method, $params, static::HTTP_GET);
       }
 
@@ -109,7 +122,8 @@ class Api {
        * @param array $params
        * @return bool|mixed
        */
-      public function post($method, $params = array()) {
+      public function post($method, $params = array())
+      {
             return $this->call($method, $params, static::HTTP_POST);
       }
 
@@ -117,7 +131,8 @@ class Api {
        * @param bool $stopOnJobError
        * @return bool|int
        */
-      public function batch_create() {
+      public function batch_create()
+      {
             $result = $this->call('/batch_create');
             return $result['success'] ? $result['batch-id'] : false;
       }
@@ -126,7 +141,8 @@ class Api {
        * @param int $batch_id
        * @return bool
        */
-      public function batch_commit($batch_id) {
+      public function batch_commit($batch_id)
+      {
             $result = $this->call('/batch_commit', array(
                 'batch-id' => $batch_id
                     ), self::HTTP_POST);
@@ -137,7 +153,8 @@ class Api {
        * @param int $batch_id
        * @return mixed
        */
-      public function batch_get_results($batch_id) {
+      public function batch_get_results($batch_id)
+      {
             return $this->call('/batch_get_results', array(
                         'batch-id' => $batch_id
                             ), self::HTTP_GET);
@@ -147,7 +164,8 @@ class Api {
        * @param int $batch_id
        * @return bool
        */
-      public function batch_delete($batch_id) {
+      public function batch_delete($batch_id)
+      {
             $results = $this->call('/batch_delete', array(
                 'batch-id' => $batch_id
                     ), self::HTTP_GET);
