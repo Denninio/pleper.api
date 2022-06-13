@@ -102,8 +102,7 @@ class Api
             } catch (RequestException $e) {
                   $result = $e->getResponse();
             }
-            echo 'results';
-            echo $result->getBody();
+
             return json_decode($result->getBody(), true);
       }
 
