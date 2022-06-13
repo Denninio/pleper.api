@@ -92,7 +92,6 @@ class Api
             }
 
             try {
-                  echo $this->endpoint . $method;
                   if ( $httpMethod === static::HTTP_GET ) {
                         $result = $client->get($this->endpoint . $method, array('query' => $params));
                   }
