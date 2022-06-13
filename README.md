@@ -12,7 +12,7 @@ Step 1: Add to the requires section of your composer.json file.
 
 ```
 "require": {
-    "pleper/api": "0.*"
+    "pleper/api": "dev-master"
 }
 ```
 
